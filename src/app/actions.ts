@@ -21,11 +21,11 @@ export async function submitSurvey(
   data: SurveyData
 ): Promise<SubmitSurveyResult> {
   try {
-    // 檢查環境變數
-    const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL
+    // 檢查環境變數（使用 NEXT_PUBLIC_ 前綴以確保 Vercel 部署時可讀取）
+    const googleScriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL
 
     if (!googleScriptUrl) {
-      console.error('GOOGLE_SCRIPT_URL 未設定在 .env.local 中')
+      console.error('NEXT_PUBLIC_GOOGLE_SCRIPT_URL 未設定')
       return {
         success: false,
         error: '伺服器配置錯誤：缺少 Google Script URL'
