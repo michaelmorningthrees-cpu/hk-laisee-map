@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://hk-laisee-map.vercel.app'),
   title: "香港利是行情地圖 2026 🧧",
   description: "全港 18 區利是公價大公開！即刻睇下你區行情係幾多？",
   openGraph: {
@@ -21,6 +23,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_HK",
     siteName: "香港利是行情地圖",
+    url: "https://hk-laisee-map.vercel.app",
   },
   twitter: {
     card: "summary_large_image",
@@ -40,6 +43,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );

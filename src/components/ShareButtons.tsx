@@ -4,31 +4,46 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Share2, Check } from 'lucide-react'
 
+const SITE_URL = 'https://hk-laisee-map.vercel.app/'
+
 interface ShareButtonsProps {
   shareText?: string
   shareUrl?: string
 }
 
 export default function ShareButtons({ 
-  shareText = '喂！原來我呢區利是公價係咁多... 快啲睇下你嗰區！👇',
+  shareText = '喂！我啱啱填咗香港利是行情地圖 🧧 睇下你嗰區公價係幾多？ 👇',
   shareUrl
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
 
-  // 獲取當前頁面 URL
-  const currentUrl = shareUrl || (typeof window !== 'undefined' ? window.location.href : '')
+  const url = shareUrl || SITE_URL
 
-  // WhatsApp 分享
-  const handleWhatsAppShare = () => {
-    const fullText = `${shareText}\n\n${currentUrl}`
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fullText)}`
-    window.open(whatsappUrl, '_blank')
+  // 分享（優先使用 Native Share API）
+  const handleShare = async () => {
+    const fullText = `${shareText}\n${url}`
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '香港利是行情地圖 2026',
+          text: shareText,
+          url: url,
+        })
+        return
+      } catch (err) {
+        console.log('Native share cancelled or failed:', err)
+      }
+    }
+
+    // Fallback: WhatsApp
+    window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank')
   }
 
   // 複製連結
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(currentUrl)
+      await navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
@@ -42,7 +57,7 @@ export default function ShareButtons({
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={handleWhatsAppShare}
+        onClick={handleShare}
         className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl"
       >
         <svg 
