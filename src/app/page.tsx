@@ -152,7 +152,7 @@ export default function Home() {
                   textShadow: '0 0 20px rgba(255, 215, 0, 0.5)',
                 }}
               >
-                喂！今年你逗幾錢？
+                今年派同收利是行情係點？
               </motion.p>
 
               {/* 英雄視覺 - 兩個吉祥物並排 */}
