@@ -15,7 +15,7 @@ export default function Home() {
   const [hasStarted, setHasStarted] = useState(false)
 
   // 幸運基數 - 238 聽起來像「易發」（粵語），而且是個不整齊的數字，看起來更真實
-  const BASE_COUNT = 238
+  const BASE_COUNT = 538
 
   // 載入參與者數量
   useEffect(() => {
