@@ -20,6 +20,8 @@ export default function SurveyPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [selectedIdentityId, setSelectedIdentityId] = useState('')
+  const [honeypot, setHoneypot] = useState('')
+  const [rateLimitMsg, setRateLimitMsg] = useState('')
 
   const [formData, setFormData] = useState<SurveyData>({
     identity: '',
@@ -71,6 +73,21 @@ export default function SurveyPage() {
   }
 
   const handleSubmit = async () => {
+    if (honeypot) return  // Bot detected, silently abort
+
+    // Rate limit: 30 秒內不可重複提交
+    const RATE_LIMIT_MS = 30_000
+    const lastSubmit = localStorage.getItem('last_submit_time')
+    if (lastSubmit) {
+      const elapsed = Date.now() - parseInt(lastSubmit, 10)
+      if (elapsed < RATE_LIMIT_MS) {
+        const remaining = Math.ceil((RATE_LIMIT_MS - elapsed) / 1000)
+        setRateLimitMsg(`提交太快，請等 ${remaining} 秒後再試`)
+        setTimeout(() => setRateLimitMsg(''), 3000)
+        return
+      }
+    }
+
     setIsSubmitting(true)
     setSubmitError('')
 
@@ -95,6 +112,7 @@ export default function SurveyPage() {
 
       if (result.success) {
         console.log('✅ 提交成功')
+        localStorage.setItem('last_submit_time', Date.now().toString())
         setSubmitSuccess(true)
 
         const params = new URLSearchParams({
@@ -474,6 +492,32 @@ export default function SurveyPage() {
                     className="w-full px-4 py-3 bg-red-800/50 border-2 border-yellow-500/30 rounded-xl text-yellow-100 placeholder-yellow-500/50 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition-all resize-none"
                   />
                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Honeypot - 隱藏欄位防機器人 */}
+          <input
+            type="text"
+            name="website_url"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            style={{ display: 'none' }}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+
+          {/* Rate limit toast */}
+          <AnimatePresence>
+            {rateLimitMsg && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                className="mt-4 p-4 bg-orange-500/20 border border-orange-400 rounded-xl flex items-center gap-3"
+              >
+                <span className="text-2xl">⏳</span>
+                <p className="text-orange-200 font-semibold">{rateLimitMsg}</p>
               </motion.div>
             )}
           </AnimatePresence>

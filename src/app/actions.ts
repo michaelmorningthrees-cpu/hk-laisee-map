@@ -32,6 +32,12 @@ export async function submitSurvey(
       }
     }
 
+    // Honeypot 防機器人檢查（伺服器端二次驗證）
+    if (data.website_url) {
+      console.warn('🤖 Bot detected via honeypot, submission blocked')
+      return { success: false, error: '提交無效' }
+    }
+
     // 驗證數據
     if (!data || Object.keys(data).length === 0) {
       return {
